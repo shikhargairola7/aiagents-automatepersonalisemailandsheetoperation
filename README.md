@@ -14,11 +14,9 @@ Choose a title that is clear, concise, and highlights the agent's purpose:
 
 This will be the main `README.md` file in your GitHub repository. It should explain what the project is, how it works, and its benefits.
 
-### Project Name: AI-Powered Personalized Job Application Email Generator
-
-### Overview
-
-This project features an n8n workflow designed to automate and personalize job application emails using an AI agent. Leveraging the "Show Me You Know Me" (SMYKM) methodology, this agent researches target companies, job roles, and hiring managers to craft highly customized and impactful emails that stand out to recruiters. The workflow integrates with Telegram for user input and output, Google Sheets for data management, and Gmail for email drafting and sending.
+### Project Name: Versatile AI Agent for Workflow Automation (n8n)
+Overview
+This project showcases a highly adaptable AI agent built within an n8n workflow, demonstrating the power of flexible prompt engineering to achieve diverse automation tasks. While initially configured for personalized job application emails using the "Show Me You Know Me" (SMYKM) methodology, the core AI agent and workflow design are versatile enough to be repurposed for various other applications, such as scheduling meetings, managing podcast collaborations, and more. The workflow seamlessly integrates with Telegram for user interaction, Google Sheets for data management, and Gmail for communication.
 
 ### Features
 
