@@ -1,0 +1,548 @@
+{
+  "name": "AI agent (that send mail update sheet make draft, label )",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.message.text }}",
+        "options": {
+          "systemMessage": "You are an expert Career Advancement Assistant, integrated into an n8n workflow. Your primary mission is to help me craft highly personalized and compelling job application emails that stand out from the crowd. You will achieve this by using the \"Show Me You Know Me\" (SMYKM) methodology.\n\n**Your Core Mission:**\nTo research the company, the role, and the hiring manager to create an authentic connection. Your goal is to draft an email that shows I have done my homework and am a perfect fit for the role.\n\n**CRUCIAL RULE: NO PLACEHOLDERS**\nYou must **NEVER** use placeholders like `[my relevant experience]`, `[a skill from the job description]`, or any other bracketed text in the final email copy. If you lack a specific piece of information (e.g., my specific achievement related to a job requirement), you must write the email creatively using the information you *do* have. If the information is too sparse to write a credible email, you must inform me that more detail is needed. Do not invent details about my experience.\n\n**Your Email Composition Process (The Job Application SMYKM Framework):**\n\n1.  **Research & Synthesize:**\n    *   Before writing, synthesize the information provided about the job, the company, and the person I'm emailing (the hiring manager or recruiter).\n    *   Look for unique, authentic details to connect with:\n        *   **The Human (Hiring Manager):** A recent article they wrote, a project they led, their university, or a shared connection on LinkedIn.\n        *   **The Company:** A recent product launch, a new funding round, a mention in the news, or their company values that resonate with me.\n        *   **The Job Role:** Key phrases and specific requirements from the job description that I can directly address.\n\n2.  **Compose the Subject Line:**\n    *   Craft a subject line that is both professional and personalized. It must grab their attention.\n    *   Use the SMYKM `+` format to connect a personal hook with the job title.\n    *   **Examples:** `Huge fan of your recent AI keynote + Senior Data Scientist Role` or `Fellow U-M Alum + Regarding the Product Manager Opening`.\n\n3.  **Compose the Email Body:**\n    *   **First Sentence (Personal Connection):** Start with a genuine, non-generic opening that references your research hook from the subject line. This proves you're not mass-mailing.\n    *   **The Transition & Intent:** Clearly state your purpose. \"I'm writing to express my enthusiastic interest in the [Job Title] position I saw on [Platform, e.g., LinkedIn/company careers page].\"\n    *   **The Value Proposition (Your Pitch):** This is the most critical part. Briefly highlight 1-2 of your key skills or achievements that directly match the most important requirements in the job description. Connect *my* past success to *their* future needs.\n    *   **The Close & Call to Action:** End with confidence. State that my resume is attached for their review and express your eagerness to discuss how my skills can benefit their team.\n\n**What to AVOID:**\n*   **Generic Buzzwords:** Avoid empty phrases like \"team player\" or \"results-oriented.\" Use concrete examples instead.\n*   **Listing Every Skill:** Do not just list skills from my resume. Focus on the 1-2 most relevant ones for *this specific job*.\n*   **Being Too Casual or Creepy:** Maintain a professional tone. Referencing a shared professional interest is good; referencing their vacation photos is bad.\n*   **Typos and Errors:** Proofread everything. A single typo can lead to rejection.\n\n**Tool Usage:**\n*   You can use the tools to retrieve information from a Google Sheet (e.g., a list of target companies or job application statuses) or to send/draft the email via Gmail.\n\nNow, process my request and help me land an interview.\nMemory : add inpute and output in simple memory linked to u ."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        200,
+        -800
+      ],
+      "id": "22aef3e5-4125-47a2-9e3a-4e9415036b11",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-2.5-flash-lite-preview-06-17",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        160,
+        -1000
+      ],
+      "id": "4d0f67a7-cb1d-4ea8-b768-a9e56db30f11",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "evdurTN8vjBOtQs6",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -340,
+        -800
+      ],
+      "id": "129560a7-ba6a-4c90-abf4-0d7e13537007",
+      "name": "Telegram Trigger",
+      "webhookId": "3332e78f-2bea-4f25-bd70-ed6616977beb",
+      "credentials": {
+        "telegramApi": {
+          "id": "OBHpWsvu9NwhEIav",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false,
+          "parse_mode": "HTML"
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1000,
+        -800
+      ],
+      "id": "07c6e13b-477a-4fec-9f4f-b7cae1258fd8",
+      "name": "Send a text message",
+      "webhookId": "143adf1b-c3d3-4ba8-bcc0-2d7a57ad24f6",
+      "credentials": {
+        "telegramApi": {
+          "id": "OBHpWsvu9NwhEIav",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog",
+          "mode": "list",
+          "cachedResultName": "testn8nagenttelegram",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1901630817,
+          "mode": "list",
+          "cachedResultName": "test2  ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog/edit#gid=1901630817"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        -260,
+        -560
+      ],
+      "id": "73494930-0a1e-4aac-b083-b087d0468e9a",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ztMrHSAaDJD08EbQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "create",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog",
+          "mode": "list",
+          "cachedResultName": "testn8nagenttelegram",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog/edit?usp=drivesdk"
+        },
+        "title": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Title', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        -80,
+        -560
+      ],
+      "id": "c1d3b70d-4344-483c-9b63-f091e6043f51",
+      "name": "Create sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ztMrHSAaDJD08EbQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Must sure to create subject line Use \"+\" to break up distinct ideas or elements.`, 'string') }}",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `write most hummnaly written mail`, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        80,
+        -560
+      ],
+      "id": "657f0da0-d06e-4efe-9949-63a5e6566e42",
+      "name": "Send a message in Gmail",
+      "webhookId": "3e8d827d-f0cf-4f5a-8221-b16dc5ce4bd9",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "S94zPL1g8R9gUd7R",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog",
+          "mode": "list",
+          "cachedResultName": "testn8nagenttelegram",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1901630817,
+          "mode": "list",
+          "cachedResultName": "test2  ",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Ack5rTSmVqXEU5sSLYRxO9mQqZOg8T1483zMXbBbEog/edit#gid=1901630817"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "mail": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('mail', `mail of prospect`, 'string') }}",
+            "name ": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('name_', `name if prospect\n`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "mail",
+              "displayName": "mail",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "name ",
+              "displayName": "name ",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        240,
+        -560
+      ],
+      "id": "66183ae5-ab49-4650-830b-d44f262edebb",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "ztMrHSAaDJD08EbQ",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "description": "While writing mail make sure u write most humnaly as possible and dont let fillers like your[ name ] something like this becuse it will be send directly to prospect"
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolThink",
+      "typeVersion": 1,
+      "position": [
+        460,
+        -960
+      ],
+      "id": "b05cea7b-fc8f-4dea-9966-320a0e890e6f",
+      "name": "Think"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}   ",
+        "contextWindowLength": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        320,
+        -940
+      ],
+      "id": "8e14acf8-edcf-44a3-a1d0-34ee24fc5701",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "jsCode": "// Get the output from the AI Agent node\nconst aiOutput = $json.output;\n\nlet processedText = aiOutput;\n\n// Example for MarkdownV2 escaping:\n// This is a basic example and might need refinement for all edge cases\nprocessedText = processedText.replace(/_/g, '\\\\_');\nprocessedText = processedText.replace(/\\*/g, '\\\\*');\nprocessedText = processedText.replace(/\\[/g, '\\\\[');\nprocessedText = processedText.replace(/\\]/g, '\\\\]');\nprocessedText = processedText.replace(/\\(/g, '\\\\(');\nprocessedText = processedText.replace(/\\)/g, '\\\\)');\nprocessedText = processedText.replace(/~/g, '\\\\~');\nprocessedText = processedText.replace(/`/g, '\\\\`');\nprocessedText = processedText.replace(/>/g, '\\\\>');\nprocessedText = processedText.replace(/#/g, '\\\\#');\nprocessedText = processedText.replace(/\\+/g, '\\\\+');\nprocessedText = processedText.replace(/-/g, '\\\\-');\nprocessedText = processedText.replace(/=/g, '\\\\=');\nprocessedText = processedText.replace(/\\|/g, '\\\\|');\nprocessedText = processedText.replace(/\\{/g, '\\\\{');\nprocessedText = processedText.replace(/\\}/g, '\\\\}');\nprocessedText = processedText.replace(/\\./g, '\\\\.');\nprocessedText = processedText.replace(/!/g, '\\\\!');\n\n// For HTML escaping (if you choose HTML parse mode and need to escape specific chars)\n// processedText = processedText.replace(/&/g, '&amp;');\n// processedText = processedText.replace(/</g, '&lt;');\n// processedText = processedText.replace(/>/g, '&gt;');\n\nreturn {\n  output: processedText // Pass the processed text to the next node\n};"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        720,
+        -800
+      ],
+      "id": "dd3b9ec0-80a4-4e6a-aadf-18d80aa538b3",
+      "name": "Code"
+    },
+    {
+      "parameters": {
+        "resource": "label",
+        "operation": "create",
+        "name": "n8n",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        400,
+        -560
+      ],
+      "id": "875a4ef5-9c84-4e3c-9da9-a391a6808640",
+      "name": "Create a label in Gmail",
+      "webhookId": "c5a6fd40-4806-4a67-9d68-d38110205ec8",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "S94zPL1g8R9gUd7R",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "draft",
+        "subject": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Subject', `Must sure to create subject line Use \"+\" to break up distinct ideas or elements.`, 'string') }}",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', `make tone genuine and engaging most humanly written `, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        580,
+        -560
+      ],
+      "id": "773ef1fd-1a58-4db2-9a16-fea517c16872",
+      "name": "Create a draft in Gmail",
+      "webhookId": "2a9d33c5-7588-4fd5-8d89-350b04243646",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "S94zPL1g8R9gUd7R",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "reply",
+        "threadId": "={{ $fromAI('Thread_ID', ``, 'string') }}",
+        "message": "={{ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        760,
+        -560
+      ],
+      "id": "060c1bc3-23fd-4cac-b1ee-dc5f749425f6",
+      "name": "Reply to a message in Gmail",
+      "webhookId": "8e68c848-7dda-48de-8e88-f14060062ae7",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "S94zPL1g8R9gUd7R",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "resource": "thread",
+        "operation": "get",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.1,
+      "position": [
+        940,
+        -580
+      ],
+      "id": "29de8098-c77f-4846-b452-fffaa212d8eb",
+      "name": "Get a thread in Gmail",
+      "webhookId": "5a088bc7-7ed1-4d98-99cc-9f61d4294053",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "S94zPL1g8R9gUd7R",
+          "name": "Gmail account"
+        }
+      },
+      "disabled": true
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Code",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a label in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Create a draft in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reply to a message in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get a thread in Gmail": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Think": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "b870413e-d0b3-4877-a0d3-600aa6c13c1d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5b0f2f74262d649b2bb250c7fddeeeae9c8ccd4d70fac21e8d861df2932dbdf8"
+  },
+  "id": "zty9DLXwpGk4ZSls",
+  "tags": []
+}
